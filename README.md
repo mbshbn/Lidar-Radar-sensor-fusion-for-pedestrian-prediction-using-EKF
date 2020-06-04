@@ -3,7 +3,7 @@
 The goal is here to locate the pedestrian using the measurements.
 
 ## 1D
-The vector state is defined as x = [pos, vel]^T, and the measurement data only contains position. So, matrix `F`, and `H` are defined as follows:
+The vector state is defined as x = [pos, vel]^T which contains position and velocity of a pedestrian, and the measurement data only contains a position for any given time. So, matrix `F`, and `H` are defined as follows:
 ```
   F = MatrixXd(2, 2);
   F << 1, 1, 0, 1;
@@ -20,7 +20,7 @@ R << 1;
 Q = MatrixXd(2, 2);
 Q << 0, 0, 0, 0;
 ```
-The filter function, first update then predicts as follows
+The filter function updates then predicts the state vector `x` as follows for any measurement data
 ```
 VectorXd z = measurements[n];
 
