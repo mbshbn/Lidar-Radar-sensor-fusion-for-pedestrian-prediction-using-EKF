@@ -1,6 +1,6 @@
 # EKF-for-pedestrian-prediction
 
-The goal is here to locate the pedestrian using the measurements.
+The goal is here to locate the pedestrian in front of a self driving car using the measurements.
 
 ## 1D
 The vector state is defined as x = [pos, vel]^T, and the measurement data only contains position. So, matrix `F`, and `H` are defined as follows:
