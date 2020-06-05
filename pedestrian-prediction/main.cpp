@@ -7,7 +7,6 @@
 #include <vector>
 #include "Eigen/Dense"
 
-using namespace std;
 using namespace Eigen;
 
 // Kalman Filter variables
@@ -87,8 +86,8 @@ void filter(VectorXd &x, MatrixXd &P) {
     x = (F * x) + u;
     P = F * P * F.transpose();
 
-    cout << "x=" << endl <<  x << endl;
-    cout << "P=" << endl <<  P << endl;
+    std::cout << "x=" << std::endl <<  x << std::endl;
+    std::cout << "P=" << std::endl <<  P << std::endl;
 
   }
 }
