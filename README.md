@@ -3,9 +3,10 @@
 The goal is here to locate the pedestrian in front of a self driving car using the measurements.
 
 ## Eigen library
-For this project [Eigen library](http://eigen.tuxfamily.org/index.php?title=Main_Page), which is linear algebra library, is used. To be able to use the Eigen library you need to
+For this project the [Eigen library](http://eigen.tuxfamily.org/index.php?title=Main_Page), which is linear algebra library, is used. To be able to use the Eigen library you need to
 * Add the path for the header files
 * Add the path for the actual code (i.e. the library)
+
 You can find instructions online, for example for [Code::Blocks IDE](https://www.learncpp.com/cpp-tutorial/a3-using-libraries-with-codeblocks/) or [CodeLite IDE](https://automaticaddison.com/how-to-add-an-external-c-library-to-your-project/).
 
 ## Kalman filter for 1D motion
