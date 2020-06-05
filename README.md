@@ -56,7 +56,7 @@ The code is inside the folder called `pedestrain-prediction-2D-Lidar`.
 
 The state vector is 4 by 1, consist of x = [pos_x, pos_y, vel_x, vel_y]^T. The following assumption is made:
 * The time interval is not constant.
-* the velocity vector is not constant, i.e. acceleration is not zero. But, we only track position and velocity, so acceleration is modeled as a random noise with 0 mean and a new covariance `Qv`.
+* A linear motion model is used. The velocity vector is not constant, i.e. acceleration is not zero. But, we only track position and velocity, so acceleration is modeled as a random noise with 0 mean and a new covariance `Qv`.
 * The process noise is considered as `a dt^2/2`, where `a` is acceleration, and `dt` is the time interval. Thus the process covariance matrix consists of `dt` and `acceleration` as a random noise. It can be decomposed of two matrices, one consists of `dt`, and the other consists of random acceleration.
 * Lidar data is a point cloud, and for simplicity here it is assumed that the dats is analyzed and the 2D location of the pedestrian is computed.
 
