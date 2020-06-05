@@ -1,3 +1,5 @@
+pedestrain-prediction-2D-Lidar/Eigen/
+pedestrian-prediction/Eigen/
 # Prerequisites
 *.d
 

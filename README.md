@@ -2,7 +2,15 @@
 
 The goal is here to locate the pedestrian in front of a self driving car using the measurements.
 
+## Eigen library
+For this project [Eigen library](http://eigen.tuxfamily.org/index.php?title=Main_Page), which is linear algebra library, is used. To be able to use the Eigen library you need to
+* Add the path for the header files
+* Add the path for the actual code (i.e. the library)
+You can find instructions online, for example for [Code::Blocks IDE](https://www.learncpp.com/cpp-tutorial/a3-using-libraries-with-codeblocks/) or [CodeLite IDE](https://automaticaddison.com/how-to-add-an-external-c-library-to-your-project/).
+
 ## Kalman filter for 1D motion
+The code is inside the folder called `pedestrian-prediction`.
+
 The vector state is defined as x = [pos, vel]^T which contains position and velocity of a pedestrian, and the measurement data only contains a position for any given time. The following assumptions are made:
 * It is assumed that the velocity remains constant between time intervals (a model uncertainty is considered), in other words a linear motion model is considered.
 * Tt is assumed that the time intervals remains constant.
@@ -43,6 +51,8 @@ x = (F * x) + u;
 P = F * P * F.transpose();
 ```
 ## Kalman filter for 2D motion using Lidar (laser) measurements
+The code is inside the folder called `pedestrain-prediction-2D-Lidar`.
+
 The state vector is 4 by 1, consist of x = [pos_x, pos_y, vel_x, vel_y]^T. The following assumption is made:
 * The time interval is not constant.
 * the velocity vector is not constant, i.e. acceleration is not zero. But, we only track position and velocity, so acceleration is modeled as a random noise with 0 mean and a new covariance `Qv`.
