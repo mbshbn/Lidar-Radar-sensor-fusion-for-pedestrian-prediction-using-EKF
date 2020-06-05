@@ -1,5 +1,8 @@
 pedestrain-prediction-2D-Lidar/Eigen/
 pedestrian-prediction/Eigen/
+*.depend
+*.layout
+
 # Prerequisites
 *.d
 

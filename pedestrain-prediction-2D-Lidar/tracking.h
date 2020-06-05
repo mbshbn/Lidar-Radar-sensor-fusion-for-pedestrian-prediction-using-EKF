@@ -76,13 +76,21 @@ Tracking::~Tracking() {
 // Process a single measurement
 void Tracking::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   if (!is_initialized_) {
-    //cout << "Kalman Filter Initialization " << endl;
+    std::cout << "Kalman Filter Initialization " << std::endl;
 
     // set the state with the initial location and zero velocity
     kf_.x_ << measurement_pack.raw_measurements_[0],
               measurement_pack.raw_measurements_[1],
               0,
               0;
+    // TEMP: for debug:
+    float x_measure = measurement_pack.raw_measurements_[0];
+    float y_measure = measurement_pack.raw_measurements_[1];
+    long t_measure = measurement_pack.timestamp_;
+    std::cout << "x_meas: "<< x_measure<<std::endl;
+    std::cout << "y_meas: "<< y_measure<<std::endl;
+    std::cout << "t_meas: "<< t_measure<<std::endl;
+    // end for debug
 
     previous_timestamp_ = measurement_pack.timestamp_;
     is_initialized_ = true;
@@ -93,6 +101,7 @@ void Tracking::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   // dt - expressed in seconds
   float dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0;
   previous_timestamp_ = measurement_pack.timestamp_;
+  std::cout << "dt= " << dt << std::endl;
 
   float dt_2 = dt * dt;
   float dt_3 = dt_2 * dt;
