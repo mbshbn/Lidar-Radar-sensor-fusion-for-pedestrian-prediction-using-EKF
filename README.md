@@ -32,6 +32,7 @@ R << 1;
 Q = MatrixXd(2, 2);
 Q << 0, 0, 0, 0;
 ```
+Usually the parameters of `R` are provided by the sensor manufactures.
 The process noise depends on both the elapsed time (larger time interval, larger uncertainty) and uncertainty of acceleration (here we use a linear model with constant velocity).
 
 The filter function updates then predicts the state vector `x` as follows for any measurement data
@@ -61,6 +62,47 @@ The state vector is 4 by 1, consist of x = [pos_x, pos_y, vel_x, vel_y]^T. The f
 * Lidar data is a point cloud, and for simplicity here it is assumed that the dats is analyzed and the 2D location of the pedestrian is computed.
 
 The code consists of three classes:
-* Kalman filter class
-* Tracking classes
+* Kalman filter class (predicts and updates)
 * Measurement class
+* Tracking classes (call other two classes, first process the measurements, then predicts and updates)
+
+The matrices are defined as
+```
+// state covariance matrix P
+kf_.P_ =Eigen::MatrixXd(4, 4);
+kf_.P_ << 1, 0, 0, 0,
+          0, 1, 0, 0,
+          0, 0, 1000, 0,
+          0, 0, 0, 1000;
+
+
+// measurement covariance
+kf_.R_ = Eigen::MatrixXd(2, 2);
+kf_.R_ << 0.0225, 0,
+          0, 0.0225;
+
+// measurement matrix
+kf_.H_ = Eigen::MatrixXd(2, 4);
+kf_.H_ << 1, 0, 0, 0,
+          0, 1, 0, 0;
+
+// the initial transition matrix F_
+kf_.F_ = Eigen::MatrixXd(4, 4);
+kf_.F_ << 1, 0, 1, 0,
+          0, 1, 0, 1,
+          0, 0, 1, 0,
+          0, 0, 0, 1;
+kf_.F_(0, 2) = dt;
+kf_.F_(1, 3) = dt;
+// the acceleration noise components
+noise_ax = 5;
+noise_ay = 5;
+//  the process covariance matrix Q
+kf_.Q_ = Eigen::MatrixXd(4, 4);
+kf_.Q_ <<  dt_4/4*noise_ax, 0, dt_3/2*noise_ax, 0,
+         0, dt_4/4*noise_ay, 0, dt_3/2*noise_ay,
+         dt_3/2*noise_ax, 0, dt_2*noise_ax, 0,
+         0, dt_3/2*noise_ay, 0, dt_2*noise_ay;
+```
+
+## Kalman filter for 2D motion using Lidar & Radar measurements
