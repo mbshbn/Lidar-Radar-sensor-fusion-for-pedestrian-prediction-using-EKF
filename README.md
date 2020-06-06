@@ -4,9 +4,9 @@ The goal is here to locate the pedestrian in front of a self driving car using t
 
 In the following you see
 * Kalman filter for 1D motion
-* Kalman filter for Lidar (Laser) measurements
-* Extended Kalman filter for Radar measurements
-* Sensor fusion (EKF) for Laser and Radar measurements
+* Kalman filter for 2D Lidar (Laser) measurements
+* Extended Kalman filter for 2D Radar measurements
+* Sensor fusion (EKF) for 2D Laser and 2D Radar measurements
 * Validation of estimation using Root Mean Square Error (RSME)
 
 ### Eigen library
@@ -57,7 +57,7 @@ P = (I-(K * H)) * P;
 
 // KF Prediction step
 x = (F * x) + u;
-P = F * P * F.transpose();
+P = F * P * F.transpose() + Q;
 ```
 ## Kalman filter for 2D motion using Lidar (laser) measurements
 The code is inside the folder called `pedestrain-prediction-2D-Lidar`.
@@ -111,8 +111,25 @@ kf_.Q_ <<  dt_4/4*noise_ax, 0, dt_3/2*noise_ax, 0,
          dt_3/2*noise_ax, 0, dt_2*noise_ax, 0,
          0, dt_3/2*noise_ay, 0, dt_2*noise_ay;
 ```
+The predict function includes
+```
+x_ = F_ * x_;
+Eigen::MatrixXd Ft = F_.transpose();
+P_ = F_ * P_ * Ft + Q_;
+```
+The update function includes
+```
+Eigen::VectorXd y = z - H_ * x_;
+Eigen::MatrixXd S = H_ * P_ * H_.transpose() + R_;
+Eigen::MatrixXd K = P_ * H_.transpose() * S.inverse();
 
-## Extended Kalman filter for 2D motion using Lidar & Radar measurements
+//new estimate
+x_ = x_ + (K * y);
+P_ = (Eigen::MatrixXd::Identity(x_.size(), x_.size()) - K * H_) * P_;
+```
+
+
+## Extended Kalman filter for 2D motion using Radar measurements
 The Radar data includes the range (the distance of the object form the origin), the radial velocity (the range rate, i.e time derivative of the range), and the bearing (the angle between x axis and the range. x axis's direction is usually in the direction of motion of the car). The angle for calculation should be between -pi and pi. So, add or subtract 2pi to have the angle between -pi and pi.
 
 So, the data is in polar coordinate frame. Thus, the measurement function `h(x)`, the functions that maps from `x` (including position and velocity in the Cartesian frame) to the measurement data (in the polar coordinate frame), is not linear. A Gaussian distribution after applying a nonlinear function may not be Gaussian. So, we use (multi-dimensional) Tyler expansion to find the linear approximation of (multidimensional equation) `h(x)`. The second and higher order terms are negligible, and ignored. So, here only the Jacobian of `h(x)` is calculated as follows.
@@ -134,7 +151,7 @@ Generally, the EKF differs from KF as follows:
 
 But for Radar, `f(x)=F*x` is linear, and we can use the same prediction equations as we used before.
 ```
-VectorXd z = measurements[n];s
+VectorXd z = measurements[n];
 
 // KF Measurement update step
 VectorXd y = z - h;
@@ -149,7 +166,11 @@ P = (I-(K * Hj)) * P;
 x = F * x ;
 P = F * P * F.transpose();
 ```
-## Validation using Root Mean Square Error (RSME)
+
+## Extended Kalman filter for 2D motion using Lidar & Radar measurements
+
+
+### Validation using Root Mean Square Error (RSME)
 In case the we have the ground truth, and we want to measure the accuracy of estimation, RMSE can be computed. Small RMSE indicated accurate estimation.
 ```
 for (unsigned int i=0; i < estimations.size(); ++i) {
