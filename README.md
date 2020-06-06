@@ -1,8 +1,15 @@
 # EKF-for-pedestrian-prediction
 
-The goal is here to locate the pedestrian in front of a self driving car using the measurements.
+The goal is here to locate the pedestrian in front of a self driving car using the Radar and Lidar measurements.
 
-## Eigen library
+In the following you see
+* Kalman filter for 1D motion
+* Kalman filter for Lidar (Laser) measurements
+* Extended Kalman filter for Radar measurements
+* Sensor fusion (EKF) for Laser and Radar measurements
+* Validation of estimation using Root Mean Square Error (RSME)
+
+### Eigen library
 For this project the [Eigen library](http://eigen.tuxfamily.org/index.php?title=Main_Page), which is linear algebra library, is used. To be able to use the Eigen library you need to
 * Add the path for the header files
 * Add the path for the actual code (i.e. the library)
@@ -105,11 +112,58 @@ kf_.Q_ <<  dt_4/4*noise_ax, 0, dt_3/2*noise_ax, 0,
          0, dt_3/2*noise_ay, 0, dt_2*noise_ay;
 ```
 
-## Kalman filter for 2D motion using Lidar & Radar measurements
-The Radar data includes the range (the distance of the object form the origin), the radial velocity (the range rate, i.e time derivative of the range), and the bearing (the angle between x axis and the range. x axis's direction is usually in the direction of motion of the car). So, the data is in polar coordinate frame. Thus, the measurement function `h(x)`, the functions that maps from `x` (including position and velocity in the Cartesian frame) to the measurement data (in the polar coordinate frame), is not linear. A Gaussian distribution after applying a nonlinear function may not be Gaussian. So, we use (multi-dimensional) Tyler expansion to find the linear approximation of (multidimensional equation) `h(x)`. The second and higher order terms are negligible, and ignored. So, here only the Jacobian of `h(x)` is calculated as follows.
+## Extended Kalman filter for 2D motion using Lidar & Radar measurements
+The Radar data includes the range (the distance of the object form the origin), the radial velocity (the range rate, i.e time derivative of the range), and the bearing (the angle between x axis and the range. x axis's direction is usually in the direction of motion of the car). The angle for calculation should be between -pi and pi. So, add or subtract 2pi to have the angle between -pi and pi.
+
+So, the data is in polar coordinate frame. Thus, the measurement function `h(x)`, the functions that maps from `x` (including position and velocity in the Cartesian frame) to the measurement data (in the polar coordinate frame), is not linear. A Gaussian distribution after applying a nonlinear function may not be Gaussian. So, we use (multi-dimensional) Tyler expansion to find the linear approximation of (multidimensional equation) `h(x)`. The second and higher order terms are negligible, and ignored. So, here only the Jacobian of `h(x)` is calculated as follows.
 ```
-// compute the Jacobian matrix
+// compute the Jacobian matrix for Radar measurements
+float c1 = px*px+py*py;
+float c2 = sqrt(c1);
+float c3 = (c1*c2);
 Hj << (px/c2), (py/c2), 0, 0,
     -(py/c1), (px/c1), 0, 0,
     py*(vx*py - vy*px)/c3, px*(px*vy - py*vx)/c3, px/c2, py/c2;
 ```  
+Note that `Hj` depends on `x` and have to be computed for each data points.
+Generally, the EKF differs from KF as follows:
+* Jacobian of f (`Fj`) is replaced with `F`
+* Jacobian of f (`Hj`) is replaced with `H`
+* nonlinear function of `f` is used instead of `F*x`
+* nonlinear function of `h` is used instead of `H*x`
+
+But for Radar, `f(x)=F*x` is linear, and we can use the same prediction equations as we used before.
+```
+VectorXd z = measurements[n];s
+
+// KF Measurement update step
+VectorXd y = z - h;
+MatrixXd S = Hj *P * Hj.transpose() + R;
+MatrixXd K = P * Hj.transpose() * S.inverse();
+
+// new state
+x = x + (K * y);
+P = (I-(K * Hj)) * P;
+
+// KF Prediction step
+x = F * x ;
+P = F * P * F.transpose();
+```
+## Validation using Root Mean Square Error (RSME)
+In case the we have the ground truth, and we want to measure the accuracy of estimation, RMSE can be computed. Small RMSE indicated accurate estimation.
+```
+for (unsigned int i=0; i < estimations.size(); ++i) {
+
+    VectorXd residual = estimations[i] - ground_truth[i];
+
+    // coefficient-wise multiplication
+    residual = residual.array()*residual.array();
+    rmse += residual;
+  }
+
+// calculate the mean
+rmse = rmse/estimations.size();
+
+// calculate the squared root
+rmse = rmse.array().sqrt();
+```
