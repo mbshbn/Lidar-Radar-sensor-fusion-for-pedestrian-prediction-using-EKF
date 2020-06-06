@@ -59,7 +59,7 @@ The state vector is 4 by 1, consist of x = [pos_x, pos_y, vel_x, vel_y]^T. The f
 * The time interval is not constant.
 * A linear motion model is used. The velocity vector is not constant, i.e. acceleration is not zero. But, we only track position and velocity, so acceleration is modeled as a random noise with 0 mean and a new covariance `Qv`.
 * The process noise is considered as `a dt^2/2`, where `a` is acceleration, and `dt` is the time interval. Thus the process covariance matrix consists of `dt` and `acceleration` as a random noise. It can be decomposed of two matrices, one consists of `dt`, and the other consists of random acceleration.
-* Lidar data is a point cloud, and for simplicity here it is assumed that the dats is analyzed and the 2D location of the pedestrian is computed.
+* Lidar data is a point cloud, and for simplicity here it is assumed that the data is analyzed and the 2D location of the pedestrian is computed.
 
 The code consists of three classes:
 * Kalman filter class (predicts and updates)
@@ -106,3 +106,10 @@ kf_.Q_ <<  dt_4/4*noise_ax, 0, dt_3/2*noise_ax, 0,
 ```
 
 ## Kalman filter for 2D motion using Lidar & Radar measurements
+The Radar data includes the range (the distance of the object form the origin), the radial velocity (the range rate, i.e time derivative of the range), and the bearing (the angle between x axis and the range. x axis's direction is usually in the direction of motion of the car). So, the data is in polar coordinate frame. Thus, the measurement function `h(x)`, the functions that maps from `x` (including position and velocity in the Cartesian frame) to the measurement data (in the polar coordinate frame), is not linear. A Gaussian distribution after applying a nonlinear function may not be Gaussian. So, we use (multi-dimensional) Tyler expansion to find the linear approximation of (multidimensional equation) `h(x)`. The second and higher order terms are negligible, and ignored. So, here only the Jacobian of `h(x)` is calculated as follows.
+```
+// compute the Jacobian matrix
+Hj << (px/c2), (py/c2), 0, 0,
+    -(py/c1), (px/c1), 0, 0,
+    py*(vx*py - vy*px)/c3, px*(px*vy - py*vx)/c3, px/c2, py/c2;
+```  
