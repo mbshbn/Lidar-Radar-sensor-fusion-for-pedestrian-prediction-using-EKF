@@ -50,7 +50,7 @@ class KalmanFilter {
   Eigen::MatrixXd R_;
 
 };
-
+/*
 KalmanFilter::KalmanFilter() {
 }
 
@@ -78,5 +78,5 @@ void KalmanFilter::Update(const Eigen::VectorXd &z) {
   Eigen::MatrixXd I = Eigen::MatrixXd::Identity(x_size, x_size);
   P_ = (I - K * H_) * P_;
 }
-
+*/
 #endif  // KALMAN_FILTER_H_

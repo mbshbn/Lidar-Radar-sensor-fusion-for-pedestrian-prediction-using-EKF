@@ -1,32 +1,6 @@
-#ifndef TRACKING_H_
-#define TRACKING_H_
-
-#include <vector>
-#include <string>
-#include <fstream>
-#include "kalman_filter.h"
-#include "measurement_package.h"
-
-class Tracking {
- public:
-  Tracking();
-  virtual ~Tracking();
-  void ProcessMeasurement(const MeasurementPackage &measurement_pack);
-  KalmanFilter kf_;
-
- private:
-  bool is_initialized_;
-  int64_t previous_timestamp_;
-
-  //acceleration noise components
-  float noise_ax;
-  float noise_ay;
-
-};
-
-/*
 #include <iostream>
 #include "Eigen/Dense"
+#include "tracking.h"
 
 //using Eigen::MatrixXd;
 //using Eigen::VectorXd;
@@ -127,7 +101,3 @@ void Tracking::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   std::cout << "x_= " << kf_.x_ << std::endl;
   std::cout << "P_= " << kf_.P_ << std::endl;
 }
-*/
-
-
-#endif  // TRACKING_H_
