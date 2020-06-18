@@ -17,6 +17,8 @@ For this project the [Eigen library](http://eigen.tuxfamily.org/index.php?title=
 You can find instructions online, for example for [Code::Blocks IDE](https://www.learncpp.com/cpp-tutorial/a3-using-libraries-with-codeblocks/) or [CodeLite IDE](https://automaticaddison.com/how-to-add-an-external-c-library-to-your-project/).
 
 ## Kalman filter for 1D motion
+To see the Kalman filter algorithm for localization in Python please see this [repository](https://github.com/mbshbn/Kalman-filter-for-robotics).
+
 The code is inside the folder called `pedestrian-prediction`.
 
 The vector state is defined as x = [pos, vel]^T which contains position and velocity of a pedestrian, and the measurement data only contains a position for any given time. The following assumptions are made:
